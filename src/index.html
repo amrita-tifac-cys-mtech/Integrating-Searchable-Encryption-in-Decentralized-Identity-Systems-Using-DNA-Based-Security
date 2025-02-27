@@ -4,39 +4,104 @@
   <meta charset="UTF-8">
   <title>DNA DID Generator</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 2em; }
-    label { display: inline-block; width: 200px; margin-top: 0.5em; }
-    input { margin-top: 0.5em; }
-    button { margin-top: 1em; }
-    .result { margin-top: 1em; padding: 0.5em; background-color: #f0f0f0; }
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 2em; 
+      background-color: #f8f9fa; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      height: 100vh;
+    }
+    .container {
+      width: 400px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      font-size: 1.5em;
+      color: #333;
+    }
+    label { 
+      display: block;
+      margin-top: 10px; 
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 15px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 10px;
+      background: #f0f0f0;
+      border-radius: 5px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    .dna-sequence {
+      font-family: monospace;
+      background: #e9ecef;
+      padding: 5px;
+      border-radius: 3px;
+      max-height: 100px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 <body>
-  <h1>DNA DID Generator</h1>
-  <form id="userForm">
-    <label for="name">Name:</label>
-    <input type="text" id="name" required><br>
+  <div class="container">
+    <h1>DNA DID Generator</h1>
+    <form id="userForm">
+      <label for="name">Name:</label>
+      <input type="text" id="name" required>
 
-    <label for="dob">Date of Birth (YYYY-MM-DD):</label>
-    <input type="date" id="dob" required><br>
+      <label for="dob">Date of Birth (YYYY-MM-DD):</label>
+      <input type="date" id="dob" required>
 
-    <label for="gender">Gender:</label>
-    <input type="text" id="gender" required><br>
+      <label for="gender">Gender:</label>
+      <input type="text" id="gender" required>
 
-    <label for="email">Email:</label>
-    <input type="email" id="email" required><br>
+      <label for="email">Email:</label>
+      <input type="email" id="email" required>
 
-    <label for="phone">Phone Number:</label>
-    <input type="tel" id="phone" required><br>
+      <label for="phone">Phone Number:</label>
+      <input type="tel" id="phone" required>
 
-    <button type="submit">Generate</button>
-  </form>
+      <label for="aadhaar">Aadhaar Number:</label>
+      <input type="text" id="aadhaar" required>
 
-  <div class="result" id="results">
-    <p id="inputString"></p>
-    <p id="hash"></p>
-    <p id="did"></p>
-    <p id="dnaSequence"></p>
+      <button type="submit">Generate</button>
+    </form>
+
+    <div class="result">
+      <p id="inputString"></p>
+      <p id="hash"></p>
+      <p id="did"></p>
+      <p id="dnaSequence" class="dna-sequence"></p>
+    </div>
   </div>
 
   <script>
@@ -51,7 +116,6 @@
       return byte.toString(2).padStart(8, '0');
     }
 
-    // Convert a byte array to a DNA sequence string
     function binaryToDNASequence(byteArray) {
       let binaryStr = "";
       for (let byte of byteArray) {
@@ -80,8 +144,9 @@
       const gender = document.getElementById('gender').value;
       const email = document.getElementById('email').value;
       const phone = document.getElementById('phone').value;
+      const aadhaar = document.getElementById('aadhaar').value;
 
-      const V = `${name},${dob},${gender},${email},${phone}`;
+      const V = `${name},${dob},${gender},${email},${phone},${aadhaar}`;
       document.getElementById('inputString').innerText = "Input: " + V;
 
       const hashBytes = await sha256(V);
