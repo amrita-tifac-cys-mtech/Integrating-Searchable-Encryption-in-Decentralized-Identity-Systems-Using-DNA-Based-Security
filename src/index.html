@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>DNA DID Generator</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; }
+    label { display: inline-block; width: 200px; margin-top: 0.5em; }
+    input { margin-top: 0.5em; }
+    button { margin-top: 1em; }
+    .result { margin-top: 1em; padding: 0.5em; background-color: #f0f0f0; }
+  </style>
+</head>
+<body>
+  <h1>DNA DID Generator</h1>
+  <form id="userForm">
+    <label for="name">Name:</label>
+    <input type="text" id="name" required><br>
+
+    <label for="dob">Date of Birth (YYYY-MM-DD):</label>
+    <input type="date" id="dob" required><br>
+
+    <label for="gender">Gender:</label>
+    <input type="text" id="gender" required><br>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" required><br>
+
+    <label for="phone">Phone Number:</label>
+    <input type="tel" id="phone" required><br>
+
+    <button type="submit">Generate</button>
+  </form>
+
+  <div class="result" id="results">
+    <p id="inputString"></p>
+    <p id="hash"></p>
+    <p id="did"></p>
+    <p id="dnaSequence"></p>
+  </div>
+
+  <script>
+    const binaryToDNA = {
+      "00": "A",
+      "01": "C",
+      "10": "G",
+      "11": "T"
+    };
+
+    function byteToBinaryString(byte) {
+      return byte.toString(2).padStart(8, '0');
+    }
+
+    // Convert a byte array to a DNA sequence string
+    function binaryToDNASequence(byteArray) {
+      let binaryStr = "";
+      for (let byte of byteArray) {
+        binaryStr += byteToBinaryString(byte);
+      }
+      let dna = "";
+      for (let i = 0; i < binaryStr.length; i += 2) {
+        const bits = binaryStr.substring(i, i + 2);
+        dna += binaryToDNA[bits];
+      }
+      return dna;
+    }
+
+    async function sha256(message) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(message);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+      return new Uint8Array(hashBuffer);
+    }
+
+    async function processInput(event) {
+      event.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const dob = document.getElementById('dob').value;
+      const gender = document.getElementById('gender').value;
+      const email = document.getElementById('email').value;
+      const phone = document.getElementById('phone').value;
+
+      const V = `${name},${dob},${gender},${email},${phone}`;
+      document.getElementById('inputString').innerText = "Input: " + V;
+
+      const hashBytes = await sha256(V);
+      const hashHex = Array.from(hashBytes)
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+      document.getElementById('hash').innerText = "Hash: " + hashHex;
+
+      const v2 = `did:avvcyber:hf:${hashHex}`;
+      document.getElementById('did').innerText = "DID: " + v2;
+
+      const v2Bytes = new TextEncoder().encode(v2);
+      const dnaSequence = binaryToDNASequence(v2Bytes);
+      document.getElementById('dnaSequence').innerText = "DNA Sequence: " + dnaSequence;
+    }
+
+    document.getElementById('userForm').addEventListener('submit', processInput);
+  </script>
+</body>
+</html>
